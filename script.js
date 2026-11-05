@@ -2,163 +2,97 @@
 (() => {
   "use strict";
 
-  const viewOrder = ["image", "gallery", "workspace"];
-  const viewContent = {
-    image: {
-      count: "01 / 03",
-      title: "Stay in the moment.",
-      description: "Move through images and document pages one at a time, with zoom, pan, text search, and the filmstrip close at hand.",
-      detail: "Focused image and document reading"
-    },
+  const screenshots = {
     gallery: {
-      count: "02 / 03",
-      title: "Everything at a glance.",
-      description: "See an entire collection in a packed, scrollable gallery. Find the image or page you're after without stepping through files one by one.",
-      detail: "Masonry layouts and a persistent filmstrip"
+      title: "Gallery view",
+      src: "assets/gallery.png",
+      caption: "Gallery view with packed image layout, filmstrip, and adjustment panel.",
+      alt: "Biltoo Gallery showing a collection of images and the filmstrip"
+    },
+    pdf: {
+      title: "PDF pages",
+      src: "assets/pdf-gallery.png",
+      caption: "A multipage PDF viewed as a gallery of pages.",
+      alt: "Biltoo displaying pages of Frankenstein in Gallery view"
+    },
+    epub: {
+      title: "EPUB search",
+      src: "assets/epub-find.png",
+      caption: "An EPUB document with text search and highlighted results.",
+      alt: "Biltoo EPUB view with text search results highlighted"
     },
     workspace: {
-      count: "03 / 03",
-      title: "Make room for ideas.",
-      description: "Arrange several images or pages on one freeform canvas. Compare, crop, and prepare a layout for print or export.",
-      detail: "Freeform composition and side-by-side comparison"
+      title: "Workspace",
+      src: "assets/workspace-crop.png",
+      caption: "Multiple images arranged on the workspace with a crop selection active.",
+      alt: "Biltoo Workspace with arranged images and a crop selection"
     }
   };
 
-  const viewTabs = [...document.querySelectorAll(".view-tab")];
-  const viewPanels = [...document.querySelectorAll(".tab-panel")];
-  const viewTitle = document.getElementById("view-title");
-  const viewDescription = document.getElementById("view-description");
-  const viewDetail = document.getElementById("view-detail");
-  const viewCount = document.getElementById("view-count");
-  let currentView = "gallery";
+  const order = Object.keys(screenshots);
+  const tabs = [...document.querySelectorAll(".shot-tab")];
+  const panel = document.getElementById("screenshot-panel");
+  const picture = document.getElementById("current-screenshot");
+  const caption = document.getElementById("screenshot-caption");
+  let selected = "gallery";
 
-  function activateView(view, focusTab = false) {
-    if (!viewContent[view]) return;
-    currentView = view;
-    viewTabs.forEach(tab => {
-      const selected = tab.dataset.view === view;
-      tab.classList.toggle("active", selected);
-      tab.setAttribute("aria-selected", String(selected));
-      tab.tabIndex = selected ? 0 : -1;
-      if (selected && focusTab) tab.focus();
-    });
-    viewPanels.forEach(panel => {
-      panel.hidden = panel.id !== `panel-${view}`;
-    });
-    const content = viewContent[view];
-    viewTitle.textContent = content.title;
-    viewDescription.textContent = content.description;
-    viewDetail.textContent = content.detail;
-    viewCount.textContent = content.count;
-  }
-
-  function stepView(direction) {
-    const index = viewOrder.indexOf(currentView);
-    activateView(viewOrder[(index + direction + viewOrder.length) % viewOrder.length]);
-  }
-
-  viewTabs.forEach(tab => {
-    tab.addEventListener("click", () => activateView(tab.dataset.view));
-    tab.addEventListener("keydown", event => {
-      if (event.key !== "ArrowRight" && event.key !== "ArrowLeft" && event.key !== "Home" && event.key !== "End") return;
-      event.preventDefault();
-      let index = viewOrder.indexOf(tab.dataset.view);
-      if (event.key === "ArrowRight") index = (index + 1) % viewOrder.length;
-      if (event.key === "ArrowLeft") index = (index - 1 + viewOrder.length) % viewOrder.length;
-      if (event.key === "Home") index = 0;
-      if (event.key === "End") index = viewOrder.length - 1;
-      activateView(viewOrder[index], true);
-    });
-  });
-  document.getElementById("previous-view").addEventListener("click", () => stepView(-1));
-  document.getElementById("next-view").addEventListener("click", () => stepView(1));
-
-  const installTabs = [...document.querySelectorAll(".install-tab")];
-  const installPanels = [...document.querySelectorAll(".install-code")];
-  function activateInstall(method, focusTab = false) {
-    installTabs.forEach(tab => {
-      const selected = tab.dataset.method === method;
-      tab.classList.toggle("active", selected);
-      tab.setAttribute("aria-selected", String(selected));
-      tab.tabIndex = selected ? 0 : -1;
-      if (selected && focusTab) tab.focus();
-    });
-    installPanels.forEach(panel => {
-      panel.hidden = panel.id !== `install-panel-${method}`;
-    });
-  }
-  installTabs.forEach(tab => {
-    tab.addEventListener("click", () => activateInstall(tab.dataset.method));
-    tab.addEventListener("keydown", event => {
-      if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
-      event.preventDefault();
-      activateInstall(tab.dataset.method === "nix" ? "source" : "nix", true);
-    });
-  });
-
-  const menuToggle = document.querySelector(".nav-toggle");
-  const nav = document.getElementById("site-navigation");
-  menuToggle.addEventListener("click", () => {
-    const expanded = menuToggle.getAttribute("aria-expanded") === "true";
-    menuToggle.setAttribute("aria-expanded", String(!expanded));
-    menuToggle.setAttribute("aria-label", expanded ? "Open navigation" : "Close navigation");
-    nav.classList.toggle("open", !expanded);
-  });
-  nav.querySelectorAll("a").forEach(link => link.addEventListener("click", () => {
-    menuToggle.setAttribute("aria-expanded", "false");
-    menuToggle.setAttribute("aria-label", "Open navigation");
-    nav.classList.remove("open");
-  }));
-
-  const shots = {
-    image: { source: "assets/epub-find.png", title: "Image view — EPUB with text search", alt: "Biltoo image view showing EPUB text search results" },
-    gallery: { source: "assets/gallery.png", title: "Gallery view — image collection", alt: "Biltoo gallery view with a mosaic of images" },
-    workspace: { source: "assets/workspace-crop.png", title: "Workspace view — arranging and cropping", alt: "Biltoo workspace with multiple pictures and crop tools" },
-    pdf: { source: "assets/pdf-gallery.png", title: "Gallery view — PDF pages", alt: "Biltoo PDF gallery showing pages of Frankenstein" }
-  };
-  const lightbox = document.getElementById("screenshot-lightbox");
-  const lightboxImage = document.getElementById("lightbox-image");
-  const lightboxCaption = document.getElementById("lightbox-caption");
-  document.querySelectorAll("[data-lightbox]").forEach(button => {
-    button.addEventListener("click", () => {
-      const shot = shots[button.dataset.lightbox];
-      if (!shot) return;
-      lightboxImage.src = shot.source;
-      lightboxImage.alt = shot.alt;
-      lightboxCaption.textContent = shot.title;
-      if (typeof lightbox.showModal === "function") lightbox.showModal();
-    });
-  });
-  document.getElementById("lightbox-close").addEventListener("click", () => lightbox.close());
-  lightbox.addEventListener("click", event => {
-    if (event.target === lightbox) lightbox.close();
-  });
-
-  document.querySelectorAll(".copy-button").forEach(button => {
-    button.addEventListener("click", async () => {
-      const command = button.dataset.copy;
-      try {
-        if (navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(command);
-        } else {
-          // Useful for local HTTP previews where the async Clipboard API is restricted.
-          const input = document.createElement("textarea");
-          input.value = command;
-          input.style.position = "fixed";
-          input.style.opacity = "0";
-          document.body.append(input);
-          input.select();
-          const copied = document.execCommand("copy");
-          input.remove();
-          if (!copied) throw new Error("Clipboard access denied");
-        }
-        button.textContent = "Copied ✓";
-      } catch {
-        // Browsers outside a secure context cannot access the Clipboard API.
-        // The command remains visible and selectable in the adjacent code block.
-        button.textContent = "Select command above";
+  function selectScreenshot(name, focus = false) {
+    if (!screenshots[name]) return;
+    selected = name;
+    const item = screenshots[name];
+    picture.src = item.src;
+    picture.alt = item.alt;
+    caption.textContent = item.caption;
+    tabs.forEach(tab => {
+      const active = tab.dataset.shot === name;
+      tab.classList.toggle("selected", active);
+      tab.setAttribute("aria-selected", String(active));
+      tab.tabIndex = active ? 0 : -1;
+      if (active) {
+        panel.setAttribute("aria-labelledby", tab.id);
+        if (focus) tab.focus();
       }
-      window.setTimeout(() => { button.textContent = "Copy ⧉"; }, 2200);
     });
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => selectScreenshot(tab.dataset.shot));
+    tab.addEventListener("keydown", event => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+      let index = order.indexOf(tab.dataset.shot);
+      if (event.key === "ArrowLeft") index = (index + order.length - 1) % order.length;
+      if (event.key === "ArrowRight") index = (index + 1) % order.length;
+      if (event.key === "Home") index = 0;
+      if (event.key === "End") index = order.length - 1;
+      selectScreenshot(order[index], true);
+    });
+  });
+
+  const dialog = document.getElementById("screenshot-dialog");
+  const dialogImage = document.getElementById("dialog-image");
+  const dialogTitle = document.getElementById("dialog-title");
+  function showScreenshot(name) {
+    const item = screenshots[name];
+    if (!item || typeof dialog.showModal !== "function") return;
+    dialogImage.src = item.src;
+    dialogImage.alt = item.alt;
+    dialogTitle.textContent = item.title;
+    dialog.showModal();
+  }
+
+  document.getElementById("enlarge-screenshot").addEventListener("click", () => showScreenshot(selected));
+  document.querySelectorAll("[data-enlarge]").forEach(button => {
+    button.addEventListener("click", () => showScreenshot(button.dataset.enlarge));
+  });
+  document.querySelectorAll("[data-select-shot]").forEach(button => {
+    button.addEventListener("click", () => {
+      selectScreenshot(button.dataset.selectShot);
+      document.getElementById("screenshots").scrollIntoView({ block: "start" });
+    });
+  });
+  document.getElementById("dialog-close").addEventListener("click", () => dialog.close());
+  dialog.addEventListener("click", event => {
+    if (event.target === dialog) dialog.close();
   });
 })();
