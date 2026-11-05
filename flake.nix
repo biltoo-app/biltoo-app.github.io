@@ -14,9 +14,18 @@
         let
           website = pkgs.runCommand "biltoo-website" { } ''
             mkdir -p "$out/assets"
-            cp ${./index.html} ${./styles.css} ${./script.js} "$out/"
+            # Nix store paths have hash-prefixed basenames. Always name the
+            # output files explicitly so the website's relative URLs work.
+            cp ${./index.html} "$out/index.html"
+            cp ${./styles.css} "$out/styles.css"
+            cp ${./script.js} "$out/script.js"
             cp -R ${./assets}/. "$out/assets/"
             cp ${./.nojekyll} "$out/.nojekyll"
+
+            test -s "$out/index.html"
+            test -s "$out/styles.css"
+            test -s "$out/script.js"
+            test -f "$out/assets/biltoo.svg"
           '';
         in
         {
@@ -26,7 +35,7 @@
 
       apps = forAllSystems (pkgs:
         let
-          website = self.packages.${pkgs.system}.website;
+          website = self.packages.${pkgs.stdenv.hostPlatform.system}.website;
           serve = pkgs.writeShellApplication {
             name = "biltoo-website-serve";
             runtimeInputs = [ pkgs.python3 pkgs.xdg-utils ];
@@ -46,7 +55,7 @@
         });
 
       checks = forAllSystems (pkgs: {
-        website = self.packages.${pkgs.system}.website;
+        website = self.packages.${pkgs.stdenv.hostPlatform.system}.website;
       });
     };
 }
