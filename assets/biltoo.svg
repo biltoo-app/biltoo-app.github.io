@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Biltoo: a masonry overview of mixed content (photos + a document page)
+       on one canvas; amber ring = the cursor, as in the filmstrip chrome. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f3a4f"/>
+      <stop offset="1" stop-color="#171d2a"/>
+    </linearGradient>
+    <linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5b4fc9"/>
+      <stop offset="0.6" stop-color="#e86f8a"/>
+      <stop offset="1" stop-color="#ffb86b"/>
+    </linearGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#29b6d8"/>
+      <stop offset="1" stop-color="#1b6fa8"/>
+    </linearGradient>
+    <linearGradient id="field" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7bd389"/>
+      <stop offset="1" stop-color="#2f8f6a"/>
+    </linearGradient>
+    <clipPath id="cA"><rect x="20" y="20" width="42" height="34" rx="4"/></clipPath>
+    <clipPath id="cC"><rect x="67" y="20" width="41" height="52" rx="4"/></clipPath>
+    <clipPath id="cD"><rect x="67" y="77" width="41" height="31" rx="4"/></clipPath>
+  </defs>
+
+  <rect x="4" y="4" width="120" height="120" rx="27" fill="url(#bg)"/>
+  <rect x="5" y="5" width="118" height="118" rx="26" fill="none" stroke="#fff" stroke-opacity="0.1" stroke-width="2"/>
+
+  <!-- A: landscape photo, sea + sun -->
+  <g clip-path="url(#cA)">
+    <rect x="20" y="20" width="42" height="34" fill="url(#sea)"/>
+    <circle cx="48" cy="33" r="6" fill="#fff3b0"/>
+    <path d="M20 54 L20 44 Q34 38 44 44 T62 42 L62 54 Z" fill="#0f4c7a"/>
+  </g>
+
+  <!-- B: document page with folded corner and text lines -->
+  <path d="M20 59 H50 L62 71 V108 a4 4 0 0 1 -4 4 H24 a4 4 0 0 1 -4 -4 Z" fill="#f3f1ec" transform="translate(0 -4)"/>
+  <path d="M50 55 V67 H62 Z" fill="#c9c5ba"/>
+  <g stroke="#8a93a6" stroke-width="2.4" stroke-linecap="round">
+    <line x1="26" y1="75" x2="56" y2="75"/>
+    <line x1="26" y1="82" x2="56" y2="82"/>
+    <line x1="26" y1="89" x2="56" y2="89"/>
+    <line x1="26" y1="96" x2="44" y2="96"/>
+  </g>
+  <rect x="26" y="64" width="14" height="4" rx="2" fill="#4a7bd8"/>
+
+  <!-- C: portrait photo, dusk sky + hills -->
+  <g clip-path="url(#cC)">
+    <rect x="67" y="20" width="41" height="52" fill="url(#dusk)"/>
+    <circle cx="94" cy="46" r="7" fill="#fff0c2"/>
+    <path d="M67 72 V58 Q80 44 92 56 T108 52 V72 Z" fill="#3b2a6b"/>
+    <path d="M67 72 V64 Q84 56 108 66 V72 Z" fill="#241a45"/>
+  </g>
+
+  <!-- D: field photo -->
+  <g clip-path="url(#cD)">
+    <rect x="67" y="77" width="41" height="31" fill="url(#field)"/>
+    <path d="M67 108 L84 88 L95 100 L102 93 L108 99 V108 Z" fill="#1f6b52"/>
+  </g>
+
+  <!-- Cursor ring (amber) around the current tile -->
+  <rect x="64.5" y="17.5" width="46" height="57" rx="6.5" fill="none" stroke="#ffb22e" stroke-width="3"/>
+</svg>
