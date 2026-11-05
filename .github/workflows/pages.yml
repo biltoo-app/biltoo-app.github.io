@@ -1,0 +1,53 @@
+name: Build and publish Biltoo website
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7.0.1
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Build website from flake
+        run: |
+          nix flake check -L
+          nix build .#website -L
+
+      - name: Stage built output
+        run: |
+          mkdir -p _site
+          cp -rL result/. _site/
+          test -s _site/index.html
+          test -f _site/assets/biltoo.svg
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Nix output
+        uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: _site
+          include-hidden-files: true
+
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5.0.1

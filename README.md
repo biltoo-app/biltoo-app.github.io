@@ -4,9 +4,27 @@ A standalone static website for [Biltoo](https://github.com/Grumbel/biltoo), the
 
 The site showcases Biltoo's **Image**, **Gallery**, and **Workspace** modes, document and archive support, non-destructive adjustments, and installation instructions. All application screenshots and the logo are copied from Biltoo's own repository at commit `179a7e87488f5bc16bccc7f5137947e536b1b8c0`.
 
-## Preview locally
+## Build with Nix
 
-No build system, dependencies, or network resources are needed:
+```sh
+nix build                 # result/ contains index.html, CSS, JS, and assets
+nix build .#website       # same package, explicitly named
+nix flake check
+```
+
+The static package uses only the website's source files, and requires no network access when served. It supports `x86_64-linux` and `aarch64-linux`.
+
+## Run and preview
+
+```sh
+nix run .                         # build, serve on localhost, open a browser
+nix run . -- --no-browser         # serve without launching a browser
+nix run . -- --port 8000          # request a particular local port
+```
+
+The default port is chosen automatically. The preview serves only on `127.0.0.1` and runs until Ctrl+C.
+
+Without Nix, you can also serve the sources directly:
 
 ```sh
 python3 -m http.server 8000
@@ -16,7 +34,9 @@ Then visit `http://localhost:8000/`.
 
 ## Publish on GitHub Pages
 
-Create a GitHub user or organization whose name matches the desired Pages host—for example, `biltoo-viewer`. Create a repository named `biltoo-viewer.github.io`, push this site's `main` branch, and select **Deploy from a branch → main → /(root)** in the repository's Pages settings.
+Create a GitHub user or organization whose name matches the desired Pages host—for example, `biltoo-viewer`. Create a repository named `biltoo-viewer.github.io`, push this site's `main` branch, and select **GitHub Actions** as the Pages build and deployment source in the repository settings.
+
+The workflow `.github/workflows/pages.yml` runs `nix flake check` and `nix build .#website`, copies the resulting Nix store output (following the `result` symlink) to a staging directory, and uploads that exact output to GitHub Pages. It runs on pushes to `main` and by manual dispatch. It does not publish the source checkout directly.
 
 There is no hard-coded host or path, so this website also works as a GitHub Pages project site or on another static host.
 
