@@ -2,7 +2,7 @@ name: Build and publish Biltoo website
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
 
 permissions:
